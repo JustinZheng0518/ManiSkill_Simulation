@@ -20,17 +20,24 @@
         <h1>尺寸自适应抓取<span>。</span></h1>
         <p>在同一机械臂与夹爪上改变物体宽度，测量抓取、抬升与稳定保持。</p>
       </div>
-      <a class="button jump" href="#results">查看性能表 <span aria-hidden="true">↘</span></a>
+      <div class="intro-actions">
+        <a class="button jump" href="#results">查看性能表 <span aria-hidden="true">↘</span></a>
+        <button id="present" class="button primary" type="button" disabled>开始演示 <span aria-hidden="true">▶</span></button>
+      </div>
     </div>
     <section id="replay" class="card" aria-labelledby="replay-title">
       <div class="card-header">
         <div class="section-title"><span class="section-icon" aria-hidden="true">◈</span><h2 id="replay-title">仿真回放</h2><span class="subtle stage-caption">Franka Panda</span></div>
-        <button id="reset-view" class="button small" type="button">重置视角</button>
+        <div class="viewer-actions">
+          <button id="close-up" class="button small" type="button" aria-pressed="false" disabled>夹爪特写</button>
+          <button id="reset-view" class="button small" type="button" disabled>重置视角</button>
+          <button id="exit-presentation" class="button small" type="button" hidden>退出演示</button>
+        </div>
       </div>
       <div class="stage" id="stage">
         <div id="viewport" aria-label="可旋转和缩放的机械臂抓取仿真"></div>
         <div class="stage-overlay">
-          <span class="live"><i></i> 轨迹回放</span>
+          <span class="live"><i></i><span id="source-label">ManiSkill 轨迹回放</span></span>
           <p id="stage-width">—</p>
           <p class="subtle" id="stage-seed">正在读取轨迹</p>
         </div>
@@ -47,7 +54,10 @@
       </div>
       <div class="conditions">
         <div><h3>物体宽度</h3><span class="subtle">选择一个尺寸查看对应仿真轨迹</span></div>
-        <div id="sizes" class="sizes" aria-label="物体宽度"></div>
+        <div class="condition-controls">
+          <div id="sizes" class="sizes" aria-label="物体宽度"></div>
+          <button id="run-live" class="button small" type="button" hidden>运行新仿真 <span aria-hidden="true">↻</span></button>
+        </div>
       </div>
     </section>
     <section id="results" aria-labelledby="results-title">

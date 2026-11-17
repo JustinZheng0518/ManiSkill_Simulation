@@ -124,12 +124,17 @@ export async function createViewer(container, links) {
   controls.minDistance = .33;
   controls.maxDistance = 3;
   controls.maxPolarAngle = Math.PI * .52;
-  const reset = () => {
-    camera.position.set(.97, -1.36, .86);
-    controls.target.set(-.18, .025, .215);
+  const setCamera = (closeUp = false) => {
+    if (closeUp) {
+      camera.position.set(.38, -.58, .34);
+      controls.target.set(-.025, 0, .135);
+    } else {
+      camera.position.set(.97, -1.36, .86);
+      controls.target.set(-.18, .025, .215);
+    }
     controls.update();
   };
-  reset();
+  setCamera();
 
   scene.add(new THREE.HemisphereLight(0xf3e3c9, 0x636c64, 1.62));
   const key = new THREE.DirectionalLight(0xffecd5, 2.8);
@@ -191,7 +196,7 @@ export async function createViewer(container, links) {
   const nextPosition = new THREE.Vector3();
   const nextRotation = new THREE.Quaternion();
   return {
-    reset,
+    setCamera,
     setWidth(width) {
       object.scale.setScalar(width / 1000);
       ring.scale.set(width * .00082, width * .00082, 1);

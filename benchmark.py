@@ -186,6 +186,14 @@ def run_episode(env, seed):
     }
 
 
+def make_env(width):
+    return gym.make(
+        "SizeAdaptiveGrasp-v1", width_mm=width, obs_mode="state",
+        render_backend="cpu", sim_backend="cpu", control_mode="pd_joint_pos",
+        reward_mode="none", robot_init_qpos_noise=0,
+    )
+
+
 def wilson(successes, n):
     p = successes / n
     z = 1.95996398454
@@ -218,11 +226,7 @@ def main():
     }
     raw = []
     for width in WIDTHS:
-        env = gym.make(
-            "SizeAdaptiveGrasp-v1", width_mm=width, obs_mode="state",
-            render_backend="cpu", sim_backend="cpu", control_mode="pd_joint_pos",
-            reward_mode="none", robot_init_qpos_noise=0,
-        )
+        env = make_env(width)
         first = None
         passed = 0
         try:

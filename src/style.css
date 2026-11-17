@@ -120,3 +120,27 @@ footer { display: flex; justify-content: space-between; color: var(--muted); fon
   .card-header { padding-inline: 12px; }
   .player { gap: 6px; }
 }
+
+[hidden] { display: none !important; }
+.intro-actions, .viewer-actions, .condition-controls { display: flex; align-items: center; gap: 8px; }
+.condition-controls { flex-wrap: wrap; }
+.button.primary { background: var(--accent); border-color: var(--accent); color: #241a12; font-weight: 700; }
+.button.primary span { color: inherit; font-size: 11px; }
+.button.primary:hover { background: #fac08b; }
+.button[aria-pressed="true"] { border-color: var(--accent); color: #ffcea4; }
+body.presenting { overflow: hidden; }
+#replay.presentation {
+  position: fixed; z-index: 10; inset: 0; width: 100%; height: 100%;
+  border: 0; border-radius: 0; display: flex; flex-direction: column;
+}
+.presentation > .stage { flex: 1 1 auto; height: auto; min-height: 0; }
+.presentation > .card-header, .presentation > .player, .presentation > .conditions { flex-shrink: 0; }
+.presentation #stage-width { font-size: clamp(32px, 5vw, 64px); }
+.presentation .stage-phase { font-size: clamp(15px, 2.5vw, 24px); padding: 9px 13px; }
+.stage-phase[data-outcome="success"] { color: #dcf4ca; border-color: #a7c69e90; }
+.stage-phase[data-outcome="failure"] { color: #ffc2a6; border-color: #ce8c7090; }
+@media (max-width: 700px) {
+  .intro { flex-wrap: wrap; }
+  .viewer-actions .button, .condition-controls .button { padding: 6px 7px; font-size: 11px; }
+  .presentation .stage-caption, .presentation .stage-note { display: none; }
+}
