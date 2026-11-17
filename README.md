@@ -22,17 +22,32 @@ npm run build
 python export_demo.py grasp-lab.html
 ```
 
-## Run a fresh simulation
+## Evaluate trained models in the browser
 
-In the configured Codex cloud environment, build the viewer and start the ManiSkill server:
+Save a local model registry as `policies.local.json` in the repository root. Each checkpoint path is relative to the registry file. This example registers two policies so they can be compared on the same width and seed:
+
+```json
+[
+  {"id": "public", "label": "Public-data baseline", "checkpoint": "checkpoints/public.pt"},
+  {"id": "augmented", "label": "Public + project data", "checkpoint": "checkpoints/augmented.pt"}
+]
+```
+
+By default, the server loads each checkpoint as a CPU TorchScript policy. The model receives the batched ManiSkill `state` observation and returns one `pd_joint_pos` action. For the Panda this is seven target joint positions and a gripper command. Return a finite tensor in the environment's action space, with shape `(8,)` or `(1, 8)` for this control mode.
+
+For a different checkpoint format or input preprocessing, add `"factory": "your_adapter:load_policy"` to a registry entry. The importable Python factory receives the checkpoint as a `pathlib.Path` and returns a callable `policy(observation)`. A stateful policy can expose `reset()`, which is called before the first action of each episode. Start the server with `--obs-mode` and `--control-mode` matching training. These settings apply to all registered models. Register trusted checkpoints and adapters from the server machine. The browser sends a registered model ID, width and seed.
+
+In the configured cloud workspace, build the viewer and start the simulator server:
 
 ```sh
 npm ci
 npm run build
-/workspace/.maniskill-venv/bin/python simulate.py
+/workspace/.maniskill-venv/bin/python simulate.py --policy-config policies.local.json
 ```
 
-Open `http://127.0.0.1:4173/` in a browser on the same machine. Select a width and click **运行新仿真** (Run fresh simulation). ManiSkill runs the scripted grasp with a new scene seed, then the browser plays the resulting trajectory. The new episode stays separate from the benchmark results. On another machine with Python 3.12, ManiSkill 3.0.1 and a working Vulkan driver, replace the cloud Python path with your own Python executable.
+Open the address printed by the server in a browser on the same machine. Select a trained model and a width in **训练模型测试** (Trained model test), then click **运行抓取** (Run grasp). Leave the seed blank for a random scene or reuse the same seed to compare models. ManiSkill runs a new episode, and the page plays its trajectory and records the verdict, peak lift clearance, and longest valid hold. Trials stay in the current browser page. The saved benchmark report is separate.
+
+To run elsewhere, use a Python environment with ManiSkill 3.0.1, the model's dependencies, and a working Vulkan driver. The offline ZIP and Vite development server provide the prerecorded viewer. Run `simulate.py` for model inference.
 
 ## Reproduce the benchmark
 

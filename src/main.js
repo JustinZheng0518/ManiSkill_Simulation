@@ -1,5 +1,6 @@
 import "./style.css";
 import { createViewer } from "./scene.js";
+import { initModelTest } from "./model-test.js";
 
 const byId = (id) => document.getElementById(id);
 const seek = byId("seek");
@@ -11,12 +12,12 @@ const outsidePanel = document.querySelectorAll(".topbar, main > :not(#replay)");
 const presentButton = byId("present");
 const exitButton = byId("exit-presentation");
 const closeUpButton = byId("close-up");
-const liveButton = byId("run-live");
 const appRoot = new URL(import.meta.env.BASE_URL, document.baseURI);
-const phases = { approach: "接近物体", align: "对准夹爪", grasp: "闭合夹爪", lift: "抬升物体", hold: "稳定保持" };
+const phases = { control: "模型控制中", approach: "接近物体", align: "对准夹爪", grasp: "闭合夹爪", lift: "抬升物体", hold: "稳定保持" };
 const percent = (value) => (value * 100).toFixed(1) + "%";
 
 let viewer;
+let pendingModelRollout;
 let widths = [];
 let activeIndex = 0;
 let replay;
@@ -36,16 +37,6 @@ async function fetchJson(url) {
 
 function getData(name) {
   return window.GRASP_DATA?.[name] ?? fetchJson(new URL("data/" + name, appRoot));
-}
-
-async function enableLiveSimulation() {
-  if (window.GRASP_DATA) return;
-  try {
-    const capability = await fetchJson(new URL("api/health", appRoot));
-    liveButton.hidden = capability.simulator !== "ManiSkill";
-  } catch {
-    // Static hosting provides the recorded rollouts.
-  }
 }
 
 function node(tag, className, text) {
@@ -84,7 +75,7 @@ function animate(now) {
     paint();
     if (progress >= last) {
       setPlaying(false);
-      if (presenting) cycleAt = now + 1550;
+      if (presenting && !replay.policy) cycleAt = now + 1550;
     }
   } else if (cycleAt !== null && now >= cycleAt) {
     cycleAt = null;
@@ -103,7 +94,8 @@ function showError(message, error) {
 function showReplayStatus() {
   const width = widths[activeIndex].width_mm;
   byId("stage-width").textContent = width + " mm";
-  byId("stage-seed").textContent = "Seed " + replay.seed + " / 脚本策略";
+  byId("stage-seed").textContent = "Seed " + replay.seed + " / " + (replay.policy_label ?? "脚本示例");
+  byId("source-label").textContent = replay.policy ? "训练模型 · 本次仿真" : "ManiSkill · 预录脚本示例";
   for (const button of byId("sizes").children) {
     button.setAttribute("aria-pressed", button.dataset.width === String(width));
   }
@@ -112,48 +104,52 @@ function showReplayStatus() {
   }
 }
 
-async function loadReplay(index, { autoplay = false, fresh = false } = {}) {
+function applyReplay(result, index, autoplay) {
+  replay = result;
+  activeIndex = index;
+  progress = 0;
+  seek.max = result.frames.length - 1;
+  seek.step = ".01";
+  viewer.setWidth(widths[index].width_mm);
+  showReplayStatus();
+  byId("duration").textContent = ((result.frames.length - 1) * result.step_seconds).toFixed(2) + " s";
+  byId("error").hidden = true;
+  play.disabled = seek.disabled = presentButton.disabled = false;
+  paint();
+  setPlaying(autoplay);
+}
+
+async function loadReplay(index, { autoplay = false } = {}) {
   const request = ++selection;
-  const condition = widths[index];
   cycleAt = null;
   setPlaying(false);
-  play.disabled = seek.disabled = liveButton.disabled = presentButton.disabled = true;
+  play.disabled = seek.disabled = presentButton.disabled = true;
   byId("error").hidden = true;
-  byId("stage-width").textContent = condition.width_mm + " mm";
-  byId("stage-seed").textContent = fresh ? "正在运行新的 ManiSkill 仿真…" : "正在读取轨迹";
+  byId("stage-width").textContent = widths[index].width_mm + " mm";
+  byId("stage-seed").textContent = "正在读取轨迹";
   try {
-    let result;
-    if (fresh) {
-      const url = new URL("api/rollout", appRoot);
-      url.search = new URLSearchParams({
-        width: condition.width_mm,
-        seed: (replay.seed + 1) % (2 ** 31),
-      });
-      result = await fetchJson(url);
-    } else {
-      result = await getData(condition.replay);
-    }
-    if (request !== selection) return;
-    replay = result;
-    activeIndex = index;
-    progress = 0;
-    seek.max = result.frames.length - 1;
-    seek.step = ".01";
-    viewer.setWidth(condition.width_mm);
-    showReplayStatus();
-    byId("source-label").textContent = fresh ? "本次生成的 ManiSkill 轨迹" : "ManiSkill 轨迹回放";
-    byId("duration").textContent = ((result.frames.length - 1) * result.step_seconds).toFixed(2) + " s";
-    paint();
-    setPlaying(autoplay);
+    const result = await getData(widths[index].replay);
+    if (request === selection) applyReplay(result, index, autoplay);
   } catch (error) {
     if (request !== selection) return;
-    if (replay) showReplayStatus();
-    showError(fresh ? "新仿真运行失败，请查看仿真服务日志。" : "轨迹加载失败，请重试或切换尺寸。", error);
-  } finally {
-    if (request === selection && replay) {
-      play.disabled = seek.disabled = liveButton.disabled = presentButton.disabled = false;
+    if (replay) {
+      showReplayStatus();
+      play.disabled = seek.disabled = presentButton.disabled = false;
     }
+    showError("轨迹加载失败，请重试或切换尺寸。", error);
   }
+}
+
+function showModelRollout(result) {
+  if (!viewer) {
+    pendingModelRollout = result;
+    return;
+  }
+  const index = widths.findIndex((condition) => condition.width_mm === result.width_mm);
+  if (index < 0) return;
+  selection += 1;
+  cycleAt = null;
+  applyReplay(result, index, true);
 }
 
 function setCamera(closeUp) {
@@ -250,8 +246,9 @@ async function initialize() {
   try {
     const report = await getData("report.json");
     renderReport(report);
-    viewer = await createViewer(byId("viewport"), report.links);
     widths = report.widths;
+    initModelTest({ widths, appRoot, showRollout: showModelRollout });
+    viewer = await createViewer(byId("viewport"), report.links);
     widths.forEach((condition, index) => {
       const button = node("button", "size", condition.width_mm + " mm");
       button.type = "button";
@@ -263,8 +260,12 @@ async function initialize() {
     byId("reset-view").addEventListener("click", () => setCamera(false));
     closeUpButton.addEventListener("click", () => setCamera(closeUpButton.getAttribute("aria-pressed") !== "true"));
     closeUpButton.disabled = byId("reset-view").disabled = false;
-    await loadReplay(Math.max(0, widths.findIndex((condition) => condition.width_mm === 48)));
-    enableLiveSimulation();
+    if (pendingModelRollout) {
+      showModelRollout(pendingModelRollout);
+      pendingModelRollout = undefined;
+    } else {
+      await loadReplay(Math.max(0, widths.findIndex((condition) => condition.width_mm === 48)));
+    }
     if (new URLSearchParams(location.search).get("present") === "1") startPresentation(false);
     requestAnimationFrame(animate);
   } catch (error) {
@@ -287,7 +288,6 @@ seek.addEventListener("input", () => {
 });
 presentButton.addEventListener("click", () => startPresentation(true));
 exitButton.addEventListener("click", endPresentation);
-liveButton.addEventListener("click", () => loadReplay(activeIndex, { fresh: true, autoplay: true }));
 document.addEventListener("fullscreenchange", () => {
   if (nativeFullscreen && document.fullscreenElement !== panel) endPresentation();
 });

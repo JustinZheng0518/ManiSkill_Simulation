@@ -186,10 +186,10 @@ def run_episode(env, seed):
     }
 
 
-def make_env(width):
+def make_env(width, *, obs_mode="state", control_mode="pd_joint_pos"):
     return gym.make(
-        "SizeAdaptiveGrasp-v1", width_mm=width, obs_mode="state",
-        render_backend="cpu", sim_backend="cpu", control_mode="pd_joint_pos",
+        "SizeAdaptiveGrasp-v1", width_mm=width, obs_mode=obs_mode,
+        render_backend="cpu", sim_backend="cpu", control_mode=control_mode,
         reward_mode="none", robot_init_qpos_noise=0,
     )
 

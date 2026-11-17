@@ -144,3 +144,25 @@ body.presenting { overflow: hidden; }
   .viewer-actions .button, .condition-controls .button { padding: 6px 7px; font-size: 11px; }
   .presentation .stage-caption, .presentation .stage-note { display: none; }
 }
+
+.model-card { margin-bottom: 14px; }
+.model-card .card-header, .trial-card .card-header { border-bottom: 1px solid var(--border); }
+.policy-form {
+  display: grid; grid-template-columns: minmax(135px, 1.5fr) minmax(110px, .8fr) minmax(110px, .8fr) auto;
+  gap: 12px; align-items: end; padding: 14px 19px 0;
+}
+.policy-form label { display: grid; gap: 6px; position: relative; font-size: 12px; color: #dedfd5; }
+.policy-form label small { position: absolute; right: 0; top: 1px; color: var(--muted); font-size: 10px; }
+.policy-form select, .policy-form input {
+  width: 100%; min-width: 0; height: 36px; border: 1px solid var(--border); border-radius: 7px;
+  background: var(--raised); color: inherit; padding: 0 9px;
+}
+.policy-form .button { min-height: 36px; }
+.trial-card { margin-top: 14px; }
+.trial-status { padding: 9px 19px 13px; color: var(--muted); font-size: 12px; min-height: 37px; }
+.trial-success, .trial-status[data-outcome="success"] { color: #cce6be; }
+.trial-failure, .trial-status[data-outcome="failure"] { color: #ffbd9c; }
+@media (max-width: 650px) {
+  .policy-form { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .topbar nav a:last-child { display: none; }
+}
