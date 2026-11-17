@@ -1,0 +1,16 @@
+GRASP LAB — OFFLINE PRESENTATION
+
+1. Extract the entire ZIP.
+2. Open grasp-lab.html in Chrome, Edge, or another browser with WebGL 2.
+3. Click 开始演示 (Start presentation). The viewer cycles through 24, 36, 48,
+   and 60 mm grasps. Click 夹爪特写 (Gripper close-up) to see the fingers.
+   Press Escape to return to the size-by-size results.
+
+If your browser blocks file:// pages:
+Open a terminal in this extracted folder and run python open_demo.py.
+On Windows, you can also run py open_demo.py. On systems with a python3
+command, use python3 open_demo.py. Open the address printed in the terminal
+if the browser doesn't open automatically. Leave the terminal running.
+
+If WebGL 2 is unavailable:
+Play grasp-visualization.mp4 to see ManiSkill render two actual grasps.

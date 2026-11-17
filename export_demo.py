@@ -5,6 +5,7 @@ import html
 import json
 import re
 from pathlib import Path
+from zipfile import ZIP_DEFLATED, ZipFile
 
 
 def encode(path, media_type):
@@ -19,7 +20,11 @@ def safe_script(source):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--video", type=Path, help="optional MP4 to include when output is a ZIP")
     args = parser.parse_args()
+    archive_output = args.output.suffix.lower() == ".zip"
+    if args.video and (not archive_output or not args.video.is_file()):
+        parser.error("--video requires an existing file and a ZIP output")
     dist = Path(__file__).resolve().parent / "dist"
     page = (dist / "index.html").read_text()
     bundle = re.search(r'<script type="module"[^>]+src="([^"]+)"></script>', page)
@@ -45,7 +50,19 @@ def main():
     attribution = (dist / "robot/NOTICE").read_text() + "\n" + (dist / "robot/LICENSE").read_text()
     page = page.replace("</html>", "<!--\n" + html.escape(attribution).replace("--", "—") + "\n-->\n</html>")
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(page, encoding="utf-8")
+    if archive_output:
+        demo = dist.parent / "demo"
+        with ZipFile(args.output, mode="w", compression=ZIP_DEFLATED) as archive:
+            archive.writestr("Grasp-Lab/grasp-lab.html", page)
+            archive.write(demo / "open_demo.py", "Grasp-Lab/open_demo.py")
+            notes = (demo / "OPEN-DEMO.txt").read_text(encoding="utf-8")
+            if args.video:
+                archive.write(args.video, "Grasp-Lab/grasp-visualization.mp4")
+            else:
+                notes = notes.split("\nIf WebGL 2 is unavailable:")[0]
+            archive.writestr("Grasp-Lab/OPEN-DEMO.txt", notes)
+    else:
+        args.output.write_text(page, encoding="utf-8")
 
 
 if __name__ == "__main__":

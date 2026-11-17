@@ -4,6 +4,8 @@ An interactive 3D viewer and benchmark for a Franka Panda picking up objects of 
 
 ## Show the grasp to an audience
 
+[Download the offline demo ZIP](https://raw.githubusercontent.com/JustinZheng0518/ManiSkill_Simulation/main/demo/Grasp-Lab.zip). Extract it, open `grasp-lab.html` in a WebGL 2 browser, and click **开始演示** (Start presentation). If your browser blocks local HTML, run `python open_demo.py` from the extracted folder and use the address it prints. The ZIP also includes an MP4 rendered by ManiSkill.
+
 With Node.js 22.12 or newer, run these commands from the repository root:
 
 ```sh
@@ -13,7 +15,7 @@ npm run dev
 
 Open the URL printed by Vite. Click **开始演示** (Start presentation) for a full-window view that plays each grasp and cycles through the four widths. Use **夹爪特写** (Gripper close-up) to see the fingers close around the cube. You can also drag to orbit, scroll to zoom, change playback speed, or scrub the timeline. Press Escape or click **退出演示** to return to the results table. Add `?present=1` to the viewer URL to start in presentation mode.
 
-To bring a single HTML file to a talk, build and export the viewer. The HTML contains the meshes and recorded rollouts and opens in a WebGL 2 browser without a server.
+To regenerate the single-file viewer after making changes, build and export it. The HTML contains the meshes and recorded rollouts and opens in a WebGL 2 browser without a server.
 
 ```sh
 npm run build
