@@ -4,6 +4,12 @@ An interactive 3D viewer and benchmark for a Franka Panda picking up objects of 
 
 ## Show the grasp to an audience
 
+### Persistent web URL
+
+GitHub Pages serves the static viewer at `https://justinzheng0518.github.io/ManiSkill_Simulation/` after its first successful deployment. Configure **Settings → Pages → Build and deployment → Source → GitHub Actions** once, then run the **Deploy the Grasp Lab viewer** workflow. Subsequent pushes to `main` rebuild and publish the viewer automatically. The hosted viewer plays the recorded 3D episodes and shows the benchmark table.
+
+To evaluate a trained policy through a persistent URL, deploy `simulate.py` on a machine that can run ManiSkill and keep its endpoint available over HTTPS. It serves both the page and the inference API. Register the checkpoints there using the steps below.
+
 [Download the offline demo ZIP](https://raw.githubusercontent.com/JustinZheng0518/ManiSkill_Simulation/main/demo/Grasp-Lab.zip). Extract it, open `grasp-lab.html` in a WebGL 2 browser, and click **开始演示** (Start presentation). If your browser blocks local HTML, run `python open_demo.py` from the extracted folder and use the address it prints. The ZIP also includes an MP4 rendered by ManiSkill.
 
 With Node.js 22.12 or newer, run these commands from the repository root:
