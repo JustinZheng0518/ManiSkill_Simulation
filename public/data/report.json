@@ -1,0 +1,104 @@
+{
+  "task": "SizeAdaptiveGrasp-v1",
+  "simulator": "ManiSkill 3.0.1",
+  "control_mode": "pd_joint_pos",
+  "lift_m": 0.1,
+  "hold_s": 0.5,
+  "horizon": 160,
+  "mass_kg": 0.05,
+  "trials_per_width": 12,
+  "seed_start": 700,
+  "links": [
+    "panda_link0",
+    "panda_link1",
+    "panda_link2",
+    "panda_link3",
+    "panda_link4",
+    "panda_link5",
+    "panda_link6",
+    "panda_link7",
+    "panda_hand",
+    "panda_leftfinger",
+    "panda_rightfinger"
+  ],
+  "groups": [
+    {
+      "id": "script",
+      "label": "脚本策略"
+    },
+    {
+      "id": "public",
+      "label": "仅公开数据"
+    },
+    {
+      "id": "augmented",
+      "label": "公开 + 自有数据"
+    }
+  ],
+  "widths": [
+    {
+      "width_mm": 24,
+      "replay": "replay-24.json",
+      "results": {
+        "script": {
+          "successes": 12,
+          "n": 12,
+          "ci": [
+            0.75751,
+            1
+          ]
+        },
+        "public": null,
+        "augmented": null
+      }
+    },
+    {
+      "width_mm": 36,
+      "replay": "replay-36.json",
+      "results": {
+        "script": {
+          "successes": 12,
+          "n": 12,
+          "ci": [
+            0.75751,
+            1
+          ]
+        },
+        "public": null,
+        "augmented": null
+      }
+    },
+    {
+      "width_mm": 48,
+      "replay": "replay-48.json",
+      "results": {
+        "script": {
+          "successes": 12,
+          "n": 12,
+          "ci": [
+            0.75751,
+            1
+          ]
+        },
+        "public": null,
+        "augmented": null
+      }
+    },
+    {
+      "width_mm": 60,
+      "replay": "replay-60.json",
+      "results": {
+        "script": {
+          "successes": 12,
+          "n": 12,
+          "ci": [
+            0.75751,
+            1
+          ]
+        },
+        "public": null,
+        "augmented": null
+      }
+    }
+  ]
+}

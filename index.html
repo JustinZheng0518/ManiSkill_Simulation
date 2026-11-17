@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#151815">
+  <meta name="description" content="ManiSkill 尺寸自适应抓取评测与 3D 轨迹回放">
+  <title>抓取实验台 · Grasp Lab</title>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">⌖</span> 抓取实验台 <small>GRASP LAB</small></a>
+    <nav aria-label="页面导航"><a href="#replay">仿真回放</a><a href="#results">评测结果</a><a href="#protocol">实验方法</a></nav>
+    <span class="runtime"><i></i> ManiSkill / CPU</span>
+  </header>
+  <main id="top">
+    <div class="intro">
+      <div class="intro-copy">
+        <p class="mono eyebrow">MANIPULATION RESEARCH / SIZE GENERALIZATION</p>
+        <h1>尺寸自适应抓取<span>。</span></h1>
+        <p>在同一机械臂与夹爪上改变物体宽度，测量抓取、抬升与稳定保持。</p>
+      </div>
+      <a class="button jump" href="#results">查看性能表 <span aria-hidden="true">↘</span></a>
+    </div>
+    <section id="replay" class="card" aria-labelledby="replay-title">
+      <div class="card-header">
+        <div class="section-title"><span class="section-icon" aria-hidden="true">◈</span><h2 id="replay-title">仿真回放</h2><span class="subtle stage-caption">Franka Panda</span></div>
+        <button id="reset-view" class="button small" type="button">重置视角</button>
+      </div>
+      <div class="stage" id="stage">
+        <div id="viewport" aria-label="可旋转和缩放的机械臂抓取仿真"></div>
+        <div class="stage-overlay">
+          <span class="live"><i></i> 轨迹回放</span>
+          <p id="stage-width">—</p>
+          <p class="subtle" id="stage-seed">正在读取轨迹</p>
+        </div>
+        <div class="stage-note">拖动旋转 <span>·</span> 滚动缩放</div>
+        <div class="stage-phase" id="phase">—</div>
+        <p id="error" class="error" role="status" hidden></p>
+      </div>
+      <div class="player">
+        <button id="play" class="play" type="button" aria-label="播放回放" disabled>▶</button>
+        <span id="elapsed" class="mono time">0.00 s</span>
+        <input type="range" id="seek" min="0" max="0" value="0" aria-label="回放进度" disabled>
+        <span id="duration" class="mono time">0.00 s</span>
+        <label class="speed"><span class="visually-hidden">播放速度</span><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+      </div>
+      <div class="conditions">
+        <div><h3>物体宽度</h3><span class="subtle">选择一个尺寸查看对应仿真轨迹</span></div>
+        <div id="sizes" class="sizes" aria-label="物体宽度"></div>
+      </div>
+    </section>
+    <section id="results" aria-labelledby="results-title">
+      <div class="section-heading">
+        <div><p class="mono eyebrow">BENCHMARK RESULTS</p><h2 id="results-title">抓取性能</h2></div>
+        <a class="button" href="./data/trials.csv" download="grasp-trials.csv">下载原始 CSV <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="card table-card">
+        <div class="card-header"><h3>按物体宽度比较</h3><span class="subtle">成功率 · 成功数 / 试验数 · 95% CI</span></div>
+        <div class="table-scroll">
+          <table>
+            <caption class="visually-hidden">各宽度的按策略抓取成功率、成功次数和置信区间</caption>
+            <thead><tr><th scope="col">宽度</th><th scope="col">脚本策略 <small>可行性检查</small></th><th scope="col">仅公开数据 <small>A 组</small></th><th scope="col">公开 + 自有数据 <small>B 组</small></th><th scope="col">提升 <small>B − A</small></th></tr></thead>
+            <tbody id="results-body"></tbody>
+          </table>
+        </div>
+        <p class="table-foot">区间采用 Wilson 95% 置信区间。脚本策略可读取物体真实位姿，用于检查任务可行性。<span id="comparison-status">A / B 的训练和对比结果待测。</span></p>
+      </div>
+    </section>
+    <section id="protocol" aria-labelledby="protocol-title" class="card protocol">
+      <h2 id="protocol-title">实验方法</h2>
+      <dl><div><dt>成功判据</dt><dd id="protocol-success">—</dd></div><div><dt>测试场景</dt><dd id="protocol-seeds">—</dd></div><div><dt>训练对照</dt><dd>同一模型、动作空间和训练步数。A / B 使用相同的未见尺寸和初始场景。</dd></div></dl>
+    </section>
+    <footer>GRASP LAB <span>ManiSkill 3.0.1 · SizeAdaptiveGrasp-v1</span></footer>
+  </main>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
