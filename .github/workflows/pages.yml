@@ -40,3 +40,17 @@ jobs:
       - name: Publish the viewer
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+      - name: Verify the published viewer
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          site="${SITE_URL%/}"
+          viewer_index="$RUNNER_TEMP/grasp-lab-index.html"
+          curl --fail --silent --show-error --location --retry 6 --retry-all-errors --retry-max-time 60 --max-time 15 "$site/" --output "$viewer_index"
+          viewer_asset="$(sed -nE 's/.*src="(\.\/assets\/[^"]+\.js)".*/\1/p' "$viewer_index")"
+          test -n "$viewer_asset"
+          curl --fail --silent --show-error --location --max-time 15 "$site/${viewer_asset#./}" --output /dev/null
+          curl --fail --silent --show-error --location --max-time 15 "$site/data/report.json" |
+            jq --exit-status '.widths | type == "array" and length > 0' >/dev/null
+          echo "Verified the published viewer and benchmark data at $site/"
