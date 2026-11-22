@@ -160,8 +160,9 @@ body.presenting { overflow: hidden; }
 .policy-form .button { min-height: 36px; }
 .trial-card { margin-top: 14px; }
 .trial-status { padding: 9px 19px 13px; color: var(--muted); font-size: 12px; min-height: 37px; }
-.trial-success, .trial-status[data-outcome="success"] { color: #cce6be; }
-.trial-failure, .trial-status[data-outcome="failure"] { color: #ffbd9c; }
+.trial-status a { color: var(--accent); text-decoration: underline; }
+.trial-success, #test-status[data-outcome="success"] { color: #cce6be; }
+.trial-failure, #test-status[data-outcome="failure"] { color: #ffbd9c; }
 @media (max-width: 650px) {
   .policy-form { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .topbar nav a:last-child { display: none; }

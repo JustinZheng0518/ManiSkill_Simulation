@@ -33,10 +33,10 @@
       <form id="policy-form" class="policy-form">
         <label>训练模型<select id="model-select" required disabled><option value="">等待加载模型</option></select></label>
         <label>物体宽度<select id="test-width" required disabled></select></label>
-        <label>场景种子 <small>可选</small><input id="test-seed" type="number" min="0" max="2147483647" step="1" placeholder="随机"></label>
+        <label>场景种子 <small>可选</small><input id="test-seed" type="number" min="0" max="2147483647" step="1" placeholder="随机" disabled></label>
         <button id="run-model" class="button primary" type="submit" disabled>运行抓取 <span aria-hidden="true">▶</span></button>
       </form>
-      <p id="test-status" class="trial-status" role="status">选择尺寸和模型后，ManiSkill 会运行一次抓取。</p>
+      <p class="trial-status"><span id="test-status" role="status">正在检查仿真服务和模型。</span> <a id="model-setup" href="https://github.com/JustinZheng0518/ManiSkill_Simulation#evaluate-trained-models-in-the-browser" hidden>模型接入说明 ↗</a></p>
     </section>
     <section id="replay" class="card" aria-labelledby="replay-title">
       <div class="card-header">

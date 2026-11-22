@@ -30,6 +30,8 @@ python export_demo.py grasp-lab.html
 
 ## Evaluate trained models in the browser
 
+`simulate.py` starts the Python evaluation server. It serves the viewer, loads the registered model checkpoints, and runs a new ManiSkill grasp with the selected policy, width, and seed. It sends the resulting trajectory and metrics back to the browser. The GitHub Pages viewer plays saved 3D trajectories. Live testing uses the address of the running Python server.
+
 Save a local model registry as `policies.local.json` in the repository root. Each checkpoint path is relative to the registry file. This example registers two policies so they can be compared on the same width and seed:
 
 ```json
